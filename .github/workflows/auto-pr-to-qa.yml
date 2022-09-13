@@ -1,0 +1,25 @@
+name: Auto PR to QA branch
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+jobs:
+  merge-main-branch-back-to-qa:
+    if: github.event.pull_request.merged == true
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: 'qa'
+
+          # We need to a personal access token from a dedicated account to create this pr.
+          #The default token doesn't trigger another workflow due to the Github limitation.
+          github_token: ${{ secrets.AUTOPR_PAT }}
+
+          # we need `automerge` label so the auto pr approval and merge for us
+          pr_label: 'bot,automerge'
+          pr_title: 'Auto-merge back to qa'
+          pr_allow_empty: true

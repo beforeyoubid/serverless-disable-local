@@ -1,0 +1,248 @@
+defaults: &defaults
+  working_directory: ~/app/
+  docker:
+    - image: cimg/node:14.19
+
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.16
+  aws-cli: circleci/aws-cli@2.0
+  # codecov: codecov/codecov@3.0.0
+jobs:
+  build:
+    <<: *defaults
+    resource_class: large
+    parameters:
+      env:
+        type: enum
+        enum: ['production', 'uat', 'dev', 'qa']
+    environment:
+      STAGE: << parameters.env >>
+    steps:
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+      - run: NODE_ENV=development yarn
+      - save_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/app/node_modules/
+      - run:
+          name: Create Credential config
+          command: |
+            ./node_modules/.bin/serverless config credentials \
+              --provider aws \
+              --key $AWS_ACCESS_KEY_ID \
+              --secret $AWS_SECRET_ACCESS_KEY \
+              --profile profile-byb-serverless
+      - run:
+          name: Build functions for AWS
+          no_output_timeout: 10m
+          command: ./node_modules/.bin/serverless package --package artifacts --verbose --stage $STAGE
+      - persist_to_workspace:
+          root: ~/app
+          paths:
+            - artifacts
+
+  publish:
+    <<: *defaults
+    resource_class: large
+    parameters:
+      env:
+        type: enum
+        enum: ['production', 'uat', 'dev', 'qa']
+    environment:
+      STAGE: << parameters.env >>
+    steps:
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+      - run: NODE_ENV=development yarn
+      - save_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/app/node_modules/
+      - attach_workspace:
+          at: ~/app
+      - run: sudo apt update
+      - run: sudo apt install python3-pip
+      - run:
+          name: Create Credential config
+          command: |
+            ./node_modules/.bin/serverless config credentials \
+              --provider aws \
+              --key $AWS_ACCESS_KEY_ID \
+              --secret $AWS_SECRET_ACCESS_KEY \
+              --profile profile-byb-serverless
+      - aws-cli/install
+      - run:
+          name: Deploy Functions to AWS (serverless)
+          command: ./node_modules/.bin/serverless deploy --package artifacts --verbose --stage $STAGE
+      - aws-s3/copy:
+          aws-access-key-id: S3_ACCESS_KEY
+          aws-region: S3_REGION
+          aws-secret-access-key: S3_SECRET_KEY
+          from: src/graphql/schema.graphql
+          to: 's3://byb-graphql-schemas-us-west-2/$STAGE/<<servicename>>.graphql'
+  unit-test:
+    <<: *defaults
+    environment:
+      NODE_ENV: development
+    steps:
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+      - run:
+          name: yarn install
+          command: NODE_ENV=development yarn
+      - run:
+          name: fix perms
+          command: chmod -R 777 ~/app/node_modules
+      - run:
+          name: Tests
+          command: yarn test:ci --maxWorkers 2 --reporters default --reporters jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/jest
+      - store_test_results:
+          path: ./reports/jest
+      - run:
+          name: Upload to CodeClimate
+          command: |
+            ./cc-test-reporter format-coverage -t=clover coverage/clover.xml
+            ./cc-test-reporter upload-coverage
+      - save_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/app/node_modules/
+  lint:
+    <<: *defaults
+    environment:
+      NODE_ENV: development
+    steps:
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+      - run:
+          name: yarn install
+          command: NODE_ENV=development yarn
+      - run:
+          name: Lint Everything
+          command: yarn lint:ci
+      - run:
+          name: fix perms
+          command: chmod -R 777 ~/app/node_modules
+      - save_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/app/node_modules/
+  typescript:
+    <<: *defaults
+    environment:
+      NODE_ENV: development
+    steps:
+      - checkout
+      - restore_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+      - run:
+          name: yarn install
+          command: NODE_ENV=development yarn
+      - run:
+          name: Lint Everything
+          command: yarn types:ci
+      - run:
+          name: fix perms
+          command: chmod -R 777 ~/app/node_modules
+      - save_cache:
+          key: node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/app/node_modules/
+
+workflows:
+  version: 2
+  application:
+    jobs:
+      - unit-test
+      - lint
+      - typescript
+      - build:
+          name: build_dev
+          env: dev
+          filters:
+            branches:
+              only:
+                - develop
+      - publish:
+          name: publish_dev
+          env: dev
+          requires:
+            - build_dev
+            - unit-test
+            - lint
+            - typescript
+          filters:
+            branches:
+              only:
+                - develop
+      - build:
+          name: build_qa
+          env: qa
+          filters:
+            branches:
+              only:
+                - qa
+      - publish:
+          name: publish_qa
+          env: qa
+          requires:
+            - unit-test
+            - lint
+            - typescript
+            - build_qa
+          filters:
+            branches:
+              only:
+                - qa
+      - build:
+          name: build_uat
+          env: uat
+          filters:
+            branches:
+              only:
+                - staging
+                - /rc-.*/
+      - publish:
+          name: publish_uat
+          env: uat
+          requires:
+            - unit-test
+            - lint
+            - typescript
+            - build_uat
+          filters:
+            branches:
+              only:
+                - staging
+                - /rc-.*/
+      - build:
+          name: build_prod
+          env: production
+          filters:
+            branches:
+              only:
+                - main
+      - hold_publish_prod:
+          type: approval
+          requires:
+            - unit-test
+            - lint
+            - typescript
+            - build_prod
+          filters:
+            branches:
+              only:
+                - main
+      - publish:
+          name: publish_prod
+          env: production
+          requires:
+            - hold_publish_prod

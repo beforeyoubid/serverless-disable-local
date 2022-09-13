@@ -1,0 +1,17 @@
+name: Notify DEVELOP PR
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, ready_for_review]
+jobs:
+  notify-develop-pr-channel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify MS Teams channel
+        uses: dhollerbach/actions.send-message-to-ms-teams@1.0.10
+        if: github.head_ref != 'qa' && github.event.pull_request.draft == false # don't run if it's merging from qa to develop or draft pr
+        with:
+          webhook: ${{ secrets.MS_TEAMS_WEBHOOK_DEVELOP_PR }}
+          message:
+            '[${{ github.event.pull_request.html_url }}](${{ github.event.pull_request.html_url }}): ${{
+            github.event.pull_request.title }} by ${{ github.event.pull_request.user.login }}'

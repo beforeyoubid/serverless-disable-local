@@ -1,0 +1,27 @@
+node_modules
+coverage
+.env
+.env.db
+.build
+.DS_Store
+.bak
+yarn-error.log
+.serverless
+
+byb-key.pem
+coverage/
+
+# User-specific stuff:
+.idea/
+dist-migrations
+dist-database
+secret-byb-secrets.json
+secrets.json
+artifacts
+cc-test-reporter
+merged-coverage/
+integration-coverage/
+coverage.json
+codeclimate.json
+.nyc_output
+node_modules

@@ -1,0 +1,36 @@
+# https://github.com/marketplace/actions/auto-approve
+name: Auto approve & merge by @beforeyoubid-bot
+on:
+  pull_request:
+    branches: [qa, develop]
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto approve
+        uses: hmarr/auto-approve-action@v2.0.0
+        if:
+          ((github.head_ref == 'master' || github.head_ref == 'main') && github.base_ref == 'qa') || (github.head_ref ==
+           'qa' && github.base_ref == 'develop')
+        with:
+          # We need this github_actions actor to approve, can't use beforeyoubid_bot to approve because
+          # The pr creator can't approve its own pr
+          github-token: '${{ secrets.BEFOREYOUBID_BOT }}'
+  auto-merge:
+    name: Auto merge after successful checks
+    needs: auto-approve
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto merge
+        uses: pascalgn/automerge-action@v0.14.3
+        if:
+          ((github.head_ref == 'master' || github.head_ref == 'main') && github.base_ref == 'qa') || (github.head_ref ==
+           'qa' && github.base_ref == 'develop')
+        env:
+          # Use beforeyoubid_bot to merge the commit
+          GITHUB_TOKEN: ${{ secrets.BEFOREYOUBID_BOT }}
+          MERGE_LABELS: 'automerge'
+          MERGE_METHOD: 'merge'
+          MERGE_RETRIES: '30'
+          MERGE_RETRY_SLEEP: '10000'
+          LOG: 'DEBUG'
