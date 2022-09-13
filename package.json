@@ -1,5 +1,5 @@
 {
-  "name": "graphql-template",
+  "name": "basic-template",
   "author": "bailey@beforeyoubid.com.au",
   "version": "0.0.1",
   "license": "MIT",
@@ -13,7 +13,6 @@
     "clean": "rm -fr .build",
     "test": "jest --watch --coverage",
     "test:ci": "jest --verbose=false --coverage --passWithNoTests",
-    "test:both": "yarn test:ci && yarn test:integration && yarn merge-coverage && npx nyc report --reporter=html --report-dir=merged-coverage && open merged-coverage/index.html",
     "start:local": "node node_modules/.bin/serverless offline start --stage local",
     "start:debug": "SLS_DEBUG=* node --inspect=0.0.0.0:9229 --nolazy node_modules/.bin/serverless offline start --stage local",
     "lint": "eslint --max-warnings 0 '**/*.{ts,tsx,js,jsx}' && tsc --noEmit",
