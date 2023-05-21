@@ -4,3 +4,4 @@
 /database/dumps
 *.sql
 /coverage
+/dist
