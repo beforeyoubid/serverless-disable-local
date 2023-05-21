@@ -1,7 +1,7 @@
 {
   "name": "serverless-disable-local",
   "author": "chainat@beforeyoubid.com.au",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "description": "Enable/Disable some serverless functions on your local dev environment to reduce resource usage",
   "main": "dist/index.js",
@@ -23,9 +23,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/beforeyoubid/tbc.git"
+    "url": "git+https://github.com/beforeyoubid/serverless-disable-local.git"
   },
-  "homepage": "https://github.com/beforeyoubid/tbc#readme",
+  "homepage": "https://github.com/beforeyoubid/serverless-disable-local#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/jest": "29.4.0",
