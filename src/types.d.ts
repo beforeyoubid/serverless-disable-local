@@ -1,5 +1,16 @@
-declare global {
-  type Maybe<T> = null | undefined | T;
-}
+import { type FunctionDefinition, type FunctionDefinitionImage } from 'serverless';
 
-export {};
+type ServerlessFunctions = { [key: string]: FunctionDefinition | FunctionDefinitionImage };
+
+type FunctionName = string;
+
+type InternalPluginConfig = {
+  enabled: boolean;
+  enabledFunctions: FunctionName[];
+};
+
+type ServerlessPluginConfig = {
+  enabled: boolean;
+  activated?: FunctionName[];
+  deactivated?: FunctionName[];
+};
