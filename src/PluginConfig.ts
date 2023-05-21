@@ -10,10 +10,12 @@ export class PluginConfig {
   logging: Logging;
   functions: ServerlessFunctions;
   deactivatedFunctions: FunctionName[] = [];
+  originalFunctionsCount: number;
 
   constructor(suppliedPluginConfig: Service.Custom, functions: ServerlessFunctions, logging: Logging) {
     this.logging = logging;
     this.functions = functions;
+    this.originalFunctionsCount = Object.keys(functions).length;
     this.internalConfig = this.parseSuppliedConfig(suppliedPluginConfig, functions);
   }
 
@@ -65,7 +67,7 @@ export class PluginConfig {
   showInfo() {
     const concatFunctions = this.deactivatedFunctions.join(', ');
     const deactivatedCount = this.deactivatedFunctions.length;
-    this.logging.writeText(`${pluginName}: found ${Object.keys(this.functions).length} original function(s)`);
+    this.logging.writeText(`${pluginName}: found ${this.originalFunctionsCount} original function(s)`);
     this.logging.writeText(
       `${pluginName}: have deactivated ${deactivatedCount} function(s), (${concatFunctions || 'none'})`
     );
