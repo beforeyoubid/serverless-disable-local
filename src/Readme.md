@@ -24,7 +24,7 @@ Add this plugin to your serverless.yaml, please consider to add before `serverle
 ```
 e.g.
 plugins:
-  - '@beforeyoubid/serverless-disable-local'
+  - serverless-disable-local
   - other plugins go here
 ```
 
