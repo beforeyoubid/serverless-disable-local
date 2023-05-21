@@ -1,7 +1,7 @@
 {
   "name": "serverless-disable-local",
   "author": "chainat@beforeyoubid.com.au",
-  "version": "0.0.3",
+  "version": "0.0.6",
   "license": "MIT",
   "description": "Enable/Disable some serverless functions on your local dev environment to reduce resource usage",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "clean": "rm -fr .build",
+    "clean": "rm -fr dist",
     "test": "jest --watch",
     "test:ci": "jest --verbose=false --coverage --passWithNoTests",
     "start:local": "node node_modules/.bin/serverless offline start --stage local",
