@@ -18,7 +18,7 @@ your choice.
 Add this npm plugin package to your serverless repo
 
 ```
-  yarn add @beforeyoubid/serverless-disable-local --dev
+  yarn add serverless-disable-local --dev
 ```
 
 Add this plugin to your serverless.yaml, please consider to add before `serverless-offline` plugin
