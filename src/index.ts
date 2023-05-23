@@ -1,8 +1,8 @@
 import Serverless from 'serverless';
-import Plugin from 'serverless/classes/Plugin';
+import type Plugin from 'serverless/classes/Plugin';
 import { PluginConfig } from './PluginConfig';
 
-class ServerlessDisableLocalPlugin {
+export default class ServerlessDisableLocalPlugin {
   serverless: Serverless;
   hooks: Plugin.Hooks;
   logging: Plugin.Logging;
@@ -29,5 +29,3 @@ class ServerlessDisableLocalPlugin {
     pluginConfig.showInfo();
   }
 }
-
-module.exports = ServerlessDisableLocalPlugin;

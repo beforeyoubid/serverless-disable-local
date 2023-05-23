@@ -17,14 +17,14 @@ your choice.
 
 Add this npm plugin package to your serverless repo
 
-```
+```sh
   yarn add serverless-disable-local --dev
 ```
 
 Add this plugin to your serverless.yaml, please consider to add before `serverless-offline` plugin
 
-```
-e.g.
+```yaml
+# e.g.
 plugins:
   - serverless-disable-local
   - other plugins go here
@@ -32,7 +32,7 @@ plugins:
 
 Choose functions you would like to activate
 
-```
+```yaml
   serverless-disable-local:
     enabled: ${env:LITE_LOCAL_DEV, 'false'}
     activated:
@@ -42,7 +42,7 @@ Choose functions you would like to activate
 
 Or choose functions you would like to deactivate
 
-```
+```yaml
   serverless-disable-local:
     enabled: ${env:LITE_LOCAL_DEV, 'false'}
     deactivated:

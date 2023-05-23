@@ -1,5 +1,7 @@
 import Serverless from 'serverless';
-import { type ServerlessFunctions } from '../types';
+
+import type { ServerlessFunctions } from '../types';
+import type Service from 'serverless/classes/Service';
 
 const getMockFunction = (handler: string): Serverless.FunctionDefinitionHandler => ({
   handler,
@@ -21,7 +23,7 @@ export const enableMultipleFunctions = { enabled: 'true', activated: ['graphql',
 export const deactivateOne = { enabled: 'true', deactivated: ['cronHourly'] };
 export const deactivateMultipleFunctions = { enabled: 'true', deactivated: ['cronHourly', 'backgroundTaskA'] };
 
-export const fullConfig = {
+export const fullConfig: Service.Custom = {
   stage: 'local',
   defaultConfigType: 'cloud',
   // Start: plugin's custom settings

@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "serverless-disable-local": "*"
+  },
+  "publishConfig": {
+    "registry": "http://localhost:4873"
+  },
+  "scripts": {
+    "test": "cd .serverless && cat ./nodejs/package.json | grep lodash"
+  },
+  "devDependencies": {
+    "serverless": "^3.31.0",
+    "serverless-offline": "^12.0.4"
+  }
+}

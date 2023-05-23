@@ -10,7 +10,7 @@ import {
   deactivateMultipleFunctions,
 } from '../__seeds__/index.seed';
 import { PluginConfig } from '../PluginConfig';
-import { Logging } from 'serverless/classes/Plugin';
+import type { Logging } from 'serverless/classes/Plugin';
 
 const logfn = () => {
   // empty

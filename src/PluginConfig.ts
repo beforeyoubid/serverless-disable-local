@@ -1,9 +1,8 @@
-import Service from 'serverless/classes/Service';
+import type Service from 'serverless/classes/Service';
+import type { Logging } from 'serverless/classes/Plugin';
+
 import { pluginName } from './consts';
-import { Logging } from 'serverless/classes/Plugin';
-import { type ServerlessFunctions, type InternalPluginConfig } from './types';
-import { FunctionName } from './types';
-// import Serverless from 'serverless';
+import type { ServerlessFunctions, InternalPluginConfig, FunctionName } from './types';
 
 export class PluginConfig {
   internalConfig: InternalPluginConfig;
@@ -48,7 +47,7 @@ export class PluginConfig {
     const allFunctions = Object.keys(functions);
     const activatedFunctions = activated.length ? activated : allFunctions;
     if (deactivated.length) {
-      return activatedFunctions.filter(f => deactivated.indexOf(f) === -1);
+      return activatedFunctions.filter(f => !deactivated.includes(f));
     }
     return activatedFunctions;
   }
@@ -57,7 +56,7 @@ export class PluginConfig {
     if (!this.internalConfig.enabled) {
       return true;
     }
-    return this.internalConfig.enabledFunctions.indexOf(functionName) !== -1;
+    return this.internalConfig.enabledFunctions.includes(functionName);
   }
 
   addToDeactivatedList(functionName) {

@@ -1,0 +1,23 @@
+service: example-layer-service
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage}
+
+plugins:
+  - serverless-disable-local
+  - serverless-offline
+
+functions:
+  hello:
+    handler: handler.default
+
+custom:
+  serverless-disable-local:
+    enabled: ${env:DISABLE_FUNCTIONS}
+    deactivated:
+      - hello
+
+package:
+  path: artifacts
+  excludeDevDependencies: false
