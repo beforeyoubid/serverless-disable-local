@@ -1,15 +1,15 @@
 import { type FunctionDefinition, type FunctionDefinitionImage } from 'serverless';
 
-type ServerlessFunctions = { [key: string]: FunctionDefinition | FunctionDefinitionImage };
+export type ServerlessFunctions = { [key: string]: FunctionDefinition | FunctionDefinitionImage };
 
-type FunctionName = string;
+export type FunctionName = string;
 
-type InternalPluginConfig = {
+export type InternalPluginConfig = {
   enabled: boolean;
   enabledFunctions: FunctionName[];
 };
 
-type ServerlessPluginConfig = {
+export type ServerlessPluginConfig = {
   enabled: boolean;
   activated?: FunctionName[];
   deactivated?: FunctionName[];
