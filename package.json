@@ -9,7 +9,6 @@
     "node": ">=14"
   },
   "scripts": {
-    "clean": "rm -fr dist",
     "test": "jest --watch",
     "test:ci": "jest --verbose=false --coverage --passWithNoTests",
     "start:local": "node node_modules/.bin/serverless offline start --stage local",
@@ -19,8 +18,17 @@
     "lint:ci": "eslint --fix --max-warnings 0 '**/*.{ts,tsx,js,jsx}'",
     "types:ci": "tsc --noEmit",
     "prettier:write": "prettier --write '**/*.{ts,tsx,js,jsx,md,json}' && prettier --write '*.{ts,tsx,js,jsx,md,json}'",
-    "build": "tsc -w"
+    "build:js": "tsc",
+    "build:watch": "tsc -w",
+    "build-and-publish": "npm run build && npm publish --access public",
+    "build-and-publish-dryrun": "npm run build && npm publish --dry-run",
+    "build-and-publish-dryrun-ci": "npm run build && npm publish --registry http://localhost:4873",
+    "build": "rimraf dist && npm run build:js && npm run clean",
+    "clean": "del dist/**/__tests__/* && del dist/**/__seeds__/*"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/beforeyoubid/serverless-disable-local.git"
@@ -43,6 +51,7 @@
     "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-prettier": "4.2.1",
     "jest": "^29.5.0",
+    "jest-junit": "^16.0.0",
     "lodash": "^4.17.21",
     "prettier": "2.8.8",
     "pretty-quick": "3.1.3",
