@@ -1,11 +1,13 @@
-import { type JestConfigWithTsJest } from 'ts-jest';
+import { type Config } from 'jest';
 
-const jestConfig: JestConfigWithTsJest = {
-  preset: 'ts-jest',
+const jestConfig: Config = {
   testEnvironment: 'node',
+  transform: {
+    '^.+\\.(t|j)sx?$': '@swc/jest',
+  },
   roots: ['<rootDir>/src'],
   setupFiles: ['./jest.setup.js'],
-  testRegex: '(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$',
+  testRegex: ['(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$'],
   moduleFileExtensions: ['ts', 'tsx', 'js'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/handler.ts'],
   coveragePathIgnorePatterns: [
